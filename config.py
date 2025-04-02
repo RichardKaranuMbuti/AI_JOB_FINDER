@@ -1,12 +1,13 @@
 # LinkedIn Scraper Configuration
 
 # Search parameters
-JOB_TITLE = "Django Engineer"
+JOB_TITLE = "AI Software Engineer"
 LOCATION = "Remote"
-NUM_PAGES = 4
+NUM_PAGES = 3
 
 # Output settings
 CSV_FILENAME = "jobs.csv"
+JOBS_CSV_FILENAME = "all-jobs.csv"
 
 # Browser settings
 USE_XDOTOOL = True
