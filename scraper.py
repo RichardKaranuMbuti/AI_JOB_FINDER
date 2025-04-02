@@ -51,25 +51,32 @@ def scrape_linkedin_jobs(job_title=None, location=None, num_pages=None, use_xdot
     
     # Navigate to LinkedIn jobs search directly in this new browser
     driver = webdriver.Chrome(options=options)
-    search_url = f"https://www.linkedin.com/jobs/search/?keywords={job_title}&location={location}"
+    
+    all_jobs = []
     
     try:
-        # Navigate to the search URL
-        driver.get(search_url)
-        
-        # Use WebDriverWait for better reliability
-        wait = WebDriverWait(driver, config.ELEMENT_WAIT_TIME)
-        
-        # Wait for job listings to load
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'jobs-search__results-list')))
-        
-        all_jobs = []
-        
         # Loop through the specified number of pages
         for page in range(num_pages):
-            print(f"Scraping page {page + 1}...")
+            # Calculate the start parameter for pagination
+            # LinkedIn uses &start=25 for page 2, &start=50 for page 3, etc.
+            start_param = 25 * page
+            
+            # Construct search URL with pagination parameter
+            if page == 0:
+                search_url = f"https://www.linkedin.com/jobs/search/?keywords={job_title}&location={location}"
+            else:
+                search_url = f"https://www.linkedin.com/jobs/search/?keywords={job_title}&location={location}&start={start_param}"
+            
+            print(f"Navigating to page {page + 1} with URL: {search_url}")
+            driver.get(search_url)
+            
+            # Use WebDriverWait for better reliability
+            wait = WebDriverWait(driver, config.ELEMENT_WAIT_TIME)
             
             # Wait for job listings to load
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'jobs-search__results-list')))
+            
+            # Additional wait time to ensure full page load
             time.sleep(config.PAGE_NAVIGATION_WAIT_TIME)
             
             # Get page source and parse it
@@ -127,47 +134,6 @@ def scrape_linkedin_jobs(job_title=None, location=None, num_pages=None, use_xdot
                 except Exception as e:
                     print(f"Error processing job card: {e}")
                     continue
-            
-            # If there are more pages to scrape, click the next button
-            if page < num_pages - 1:
-                try:
-                    # Find and click the next page button - try different selectors
-                    next_button = None
-                    for selector in [
-                        "//button[@aria-label='Next']", 
-                        "//button[contains(@aria-label, 'Page')]",
-                        "//li[contains(@class, 'artdeco-pagination__indicator--number')]/button"
-                    ]:
-                        try:
-                            buttons = driver.find_elements(By.XPATH, selector)
-                            if buttons:
-                                # Find the button with the next page number
-                                current_page = page + 1
-                                for button in buttons:
-                                    if button.is_displayed() and button.is_enabled():
-                                        if button.get_attribute("aria-label") == f"Page {current_page + 1}":
-                                            next_button = button
-                                            break
-                            
-                            if next_button:
-                                break
-                        except:
-                            continue
-                    
-                    if next_button:
-                        # Scroll to the button to make it clickable
-                        driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-                        time.sleep(1)
-                        next_button.click()
-                        
-                        # Wait for the next page to load
-                        time.sleep(config.PAGE_NAVIGATION_WAIT_TIME)
-                    else:
-                        print("Could not find next page button")
-                        break
-                except Exception as e:
-                    print(f"Could not navigate to next page: {e}")
-                    break
         
         # Write all collected jobs to CSV
         with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:

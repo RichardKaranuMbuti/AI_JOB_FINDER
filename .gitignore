@@ -1,3 +1,4 @@
 venv/
 chrome-data/
 __pycache__/
+prompt.txt

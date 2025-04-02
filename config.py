@@ -3,7 +3,7 @@
 # Search parameters
 JOB_TITLE = "Django Engineer"
 LOCATION = "Remote"
-NUM_PAGES = 10
+NUM_PAGES = 4
 
 # Output settings
 CSV_FILENAME = "jobs.csv"
