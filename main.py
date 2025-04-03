@@ -30,7 +30,9 @@ def main():
         job_title=job_title,
         location=location,
         num_pages=num_pages,
-        use_xdotool=use_xdotool
+        use_xdotool=use_xdotool,
+        batch_size=5,
+        max_workers=5
     )
 
 if __name__ == "__main__":
