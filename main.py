@@ -26,12 +26,12 @@ def main():
     use_xdotool = not args.no_xdotool if args.no_xdotool is not False else None
     
     # Call the scraper with only explicitly provided arguments (others will use config values)
-    scrape_linkedin_jobs_from_global_search(
-        job_title=job_title,
-        location=location,
-        num_pages=num_pages,
-        use_xdotool=use_xdotool
-    )
+    # scrape_linkedin_jobs_from_global_search(
+    #     job_title=job_title,
+    #     location=location,
+    #     num_pages=num_pages,
+    #     use_xdotool=use_xdotool
+    # )
 
     scrape_linkedin_jobs_from_jobs_search(
         job_title=job_title,

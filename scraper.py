@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from chrome_setup import open_linkedin_in_active_chrome
 import config
+import re
 
 def scrape_linkedin_jobs_from_global_search(job_title=None, location=None, num_pages=None, use_xdotool=None):
     """
@@ -151,10 +152,10 @@ def scrape_linkedin_jobs_from_global_search(job_title=None, location=None, num_p
         # Close the Selenium driver
         driver.quit()
 
+
 def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pages=None, use_xdotool=None):
     """
-    Scrape LinkedIn jobs from the Jobs menu search with improved error handling
-    and more robust element selection.
+    Scrape LinkedIn jobs from the Jobs menu search 
     
     Args:
         job_title (str, optional): Job title to search for. Defaults to config value.
@@ -191,7 +192,14 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
     
     # Step 2: Create a new Selenium instance to scrape the data
     options = Options()
+
+    #If you're running this on a server without a display, you might need to add
     options.add_argument("--start-maximized")
+
+    #Handle CAPTCHA detection
+    options.add_argument("--disable-blink-features=AutomationControlled") 
+    options.add_experimental_option("excludeSwitches", ["enable-automation"]) 
+    options.add_experimental_option("useAutomationExtension", False) 
     
     # Navigate to LinkedIn jobs search directly in this new browser
     driver = webdriver.Chrome(options=options)
@@ -247,10 +255,10 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             
-            # Try different selectors for job cards based on the HTML structure you provided
+            # Try different selectors for job cards based on the HTML structure
             job_cards = []
             
-            # Method 1: Find by data-job-id attribute
+            # Method 1: Find by data-job-id attribute (MAIN METHOD - Direct match to your HTML structure)
             job_cards = soup.find_all('div', attrs={'data-job-id': True})
             
             # Method 2: Try li elements with occludable-update class
@@ -276,41 +284,28 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
             # Process job cards
             for job_card in job_cards:
                 try:
-                    # Extract job ID - first try to get it directly from the job card
-                    job_id = None
-                    
-                    # Try to get job_id from the div with data-job-id attribute
-                    job_div = job_card.find('div', attrs={'data-job-id': True})
-                    if job_div:
-                        job_id = job_div.get('data-job-id', 'N/A')
-                    # If not found, try occludable attribute
-                    elif job_card.has_attr('data-occludable-job-id'):
-                        job_id = job_card.get('data-occludable-job-id', 'N/A')
-                    else:
-                        job_id = 'N/A'
-                    
-                    # Find the job title - try multiple approaches
+                    # Extract job title - try multiple approaches
                     job_title_text = 'N/A'
                     
-                    # Method 1: Look for elements with aria-label
-                    job_title_tag = job_card.find('a', attrs={'aria-label': True})
-                    if job_title_tag:
-                        job_title_text = job_title_tag['aria-label']
+                    # Method 1: Look for aria-label on anchor tag
+                    job_title_anchor = job_card.find('a', attrs={'aria-label': True})
+                    if job_title_anchor:
+                        job_title_text = job_title_anchor['aria-label']
                     
-                    # Method 2: Look for specific class
+                    # Method 2: Look for <strong> inside span as shown in your HTML example
+                    if job_title_text == 'N/A':
+                        title_span = job_card.find('span', attrs={'aria-hidden': 'true'})
+                        if title_span and title_span.find('strong'):
+                            job_title_text = title_span.find('strong').get_text(strip=True)
+                    
+                    # Method 3: Look for specific class names
                     if job_title_text == 'N/A':
                         title_classes = ['job-card-list__title', 'base-search-card__title', 'job-card-container__link']
                         for cls in title_classes:
-                            title_tag = job_card.find(['a', 'h3'], class_=cls)
+                            title_tag = job_card.find(['a', 'h3'], class_=lambda c: c and cls in c)
                             if title_tag:
                                 job_title_text = title_tag.get_text(strip=True)
                                 break
-                    
-                    # Method 3: Look for strong tag inside span
-                    if job_title_text == 'N/A':
-                        span_with_strong = job_card.find('span', attrs={'aria-hidden': 'true'})
-                        if span_with_strong and span_with_strong.find('strong'):
-                            job_title_text = span_with_strong.find('strong').get_text(strip=True)
                     
                     # Extract job URL
                     job_link = 'N/A'
@@ -322,10 +317,10 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
                         if job_link and not job_link.startswith('http'):
                             job_link = base_linkedin_url + job_link
                     
-                    # Find company name - try multiple approaches
+                    # Find company name
                     company_name = 'N/A'
                     
-                    # Method 1: Look for specific class with company name
+                    # Method 1: Look for the specific class as shown in your HTML example
                     company_tag = job_card.find('span', class_=lambda c: c and 'qHYMDgztNEREKlSMgIjhyyyqAxxeVviD' in c)
                     if company_tag:
                         company_name = company_tag.get_text(strip=True)
@@ -342,10 +337,10 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
                         if h4_tag:
                             company_name = h4_tag.get_text(strip=True)
                     
-                    # Find location - try multiple approaches
+                    # Find location - using the exact class from your HTML example
                     job_location = 'N/A'
                     
-                    # Method 1: Look for specific class with location
+                    # Method 1: Using exact class from your HTML
                     location_li = job_card.find('li', class_=lambda c: c and 'bKQmZihARnOXesSdpcmicRgZiMVAUmlKncY' in c)
                     if location_li:
                         location_span = location_li.find('span')
@@ -354,9 +349,13 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
                     
                     # Method 2: Look for span with dir=ltr
                     if job_location == 'N/A':
-                        location_span = job_card.find('span', attrs={'dir': 'ltr'})
-                        if location_span and not location_span.find('strong'):  # Exclude job title spans
-                            job_location = location_span.get_text(strip=True)
+                        location_spans = job_card.find_all('span', attrs={'dir': 'ltr'})
+                        for span in location_spans:
+                            # Skip spans that are part of job title or Easy Apply
+                            parent_is_li = span.parent and span.parent.name == 'li'
+                            if parent_is_li and span.get_text(strip=True) != "Easy Apply":
+                                job_location = span.get_text(strip=True)
+                                break
                     
                     # Method 3: Look for job-search-card__location class
                     if job_location == 'N/A':
@@ -364,21 +363,48 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
                         if location_span:
                             job_location = location_span.get_text(strip=True)
                     
-                    # Check if it's Easy Apply
-                    is_easy_apply = 'No'
-                    easy_apply_span = job_card.find('span', string=lambda s: s and 'Easy Apply' in s)
-                    if easy_apply_span:
-                        is_easy_apply = 'Yes'
+                    # Extract job ID from URL - we'll add this to the dictionary later
+                    job_id = 'N/A'
                     
-                    # Add job to our collection
-                    all_jobs.append({
-                        'Job ID': job_id,
+                    # Create job entry with placeholder for job_id
+                    job_entry = {
+                        'Job ID': job_id,  # Placeholder, will be updated below
                         'Job Title': job_title_text,
                         'Company Name': company_name,
                         'Location': job_location,
-                        'Easy Apply': is_easy_apply,
                         'Job URL': job_link
-                    })
+                    }
+                    
+                    # Now extract the job ID from the URL if available
+                    if job_link != 'N/A' and '/jobs/view/' in job_link:
+                        # Extract the job ID from the URL
+                        # Pattern: /jobs/view/job-title-at-company-JOBID/
+                        try:
+                            # Find the ID between the last hyphen and the ? or / character
+                            url_parts = job_link.split('/')
+                            for part in url_parts:
+                                if 'at-' in part and '?' in part:
+                                    # Extract the ID between "at-company-" and "?position"
+                                    id_part = part.split('at-')[-1].split('?')[0]
+                                    numeric_id = ''.join(filter(str.isdigit, id_part))
+                                    if numeric_id:
+                                        job_id = numeric_id
+                                        break
+                            
+                            # If we still don't have an ID, try another approach
+                            if job_id == 'N/A':
+                                # Try to find the pattern after the last hyphen and before "?position"
+                                match = re.search(r'-(\d+)/?\?', job_link)
+                                if match:
+                                    job_id = match.group(1)
+                        except Exception as e:
+                            print(f"Error extracting job ID from URL: {e}")
+                    
+                    # Update the job entry with the extracted job ID
+                    job_entry['Job ID'] = job_id
+                    
+                    # Add job to our collection
+                    all_jobs.append(job_entry)
                     
                 except Exception as e:
                     print(f"Error processing job card: {e}")
@@ -407,13 +433,23 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
                                 nearby_link = card.find('a', href=True)
                                 job_link = nearby_link['href'] if nearby_link else 'N/A'
                                 
+                                # Try to extract job ID from URL
+                                job_id = 'N/A'
+                                if job_link != 'N/A' and '/jobs/view/' in job_link:
+                                    try:
+                                        # Try regex to extract numeric ID
+                                        match = re.search(r'-(\d+)/?\?', job_link)
+                                        if match:
+                                            job_id = match.group(1)
+                                    except:
+                                        pass
+                                
                                 # Add this as a potential job
                                 all_jobs.append({
-                                    'Job ID': 'unknown',
+                                    'Job ID': job_id,
                                     'Job Title': title_text,
                                     'Company Name': 'unknown',
                                     'Location': 'unknown',
-                                    'Easy Apply': 'unknown',
                                     'Job URL': job_link
                                 })
                                 break
@@ -425,7 +461,7 @@ def scrape_linkedin_jobs_from_jobs_search(job_title=None, location=None, num_pag
         # Write all collected jobs to CSV
         if all_jobs:
             with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
-                fieldnames = ['Job ID', 'Job Title', 'Company Name', 'Location', 'Easy Apply', 'Job URL']
+                fieldnames = ['Job ID', 'Job Title', 'Company Name', 'Location', 'Job URL']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
                 for job in all_jobs:
