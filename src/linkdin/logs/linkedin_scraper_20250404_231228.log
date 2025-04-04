@@ -1,0 +1,18 @@
+2025-04-04 23:12:28,092 - linkedin_scraper - INFO - Starting LinkedIn job scraping
+2025-04-04 23:12:28,093 - linkedin_scraper - INFO - Starting LinkedIn job search for 'AI Software Engineer' in 'Remote'
+2025-04-04 23:12:28,093 - linkedin_scraper - INFO - Scraping 1 page(s)
+2025-04-04 23:12:28,116 - linkedin_scraper - INFO - Initializing Selenium Chrome driver
+2025-04-04 23:12:29,801 - linkedin_scraper - INFO - Setting up LinkedIn with xdotool
+2025-04-04 23:12:32,822 - linkedin_scraper - INFO - Waiting for LinkedIn Jobs to load...
+2025-04-04 23:12:38,828 - linkedin_scraper - INFO - Scraping job listings for AI Software Engineer in Remote
+2025-04-04 23:12:38,838 - linkedin_scraper - INFO - Navigating to page 1 with URL: https://www.linkedin.com/jobs/search/?keywords=AI%20Software%20Engineer&location=Remote
+2025-04-04 23:12:53,118 - linkedin_scraper - INFO - Found job results container using selector: ul.jobs-search__results-list
+2025-04-04 23:12:56,598 - linkedin_scraper - INFO - Found 60 job listings on page 1
+2025-04-04 23:12:56,705 - linkedin_scraper - INFO - Initial job scraping complete. Found 60 jobs.
+2025-04-04 23:12:56,705 - linkedin_scraper - INFO - Now fetching detailed information for jobs with valid Job IDs...
+2025-04-04 23:22:03,101 - linkedin_scraper - INFO - Job details have been written to 'all-jobs.csv' successfully!
+2025-04-04 23:22:03,103 - linkedin_scraper - INFO - Total jobs found: 60
+2025-04-04 23:22:03,103 - linkedin_scraper - INFO - Jobs with detailed information: 59
+2025-04-04 23:22:03,104 - linkedin_scraper - INFO - Saving 60 jobs to database
+2025-04-04 23:22:03,223 - linkedin_scraper - INFO - Database operation complete. Inserted: 60, Updated: 0, Failed: 0
+2025-04-04 23:22:03,396 - linkedin_scraper - INFO - LinkedIn job scraping completed
