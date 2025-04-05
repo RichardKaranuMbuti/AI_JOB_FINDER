@@ -1,0 +1,2 @@
+2025-04-05 16:31:47,716 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-05 16:31:47,735 - linkedin_scraper - INFO - Successfully saved analysis for job ID: 4191815023

@@ -1,0 +1,7 @@
+2025-04-05 16:10:37,740 - linkedin_scraper - INFO - Searching for job_id: 4191815023 (type: <class 'str'>)
+2025-04-05 16:10:37,747 - linkedin_scraper - INFO - Total jobs in database: 60
+2025-04-05 16:10:37,747 - linkedin_scraper - INFO - Sample job_id: 4191146990 (type: <class 'str'>)
+2025-04-05 16:10:37,751 - linkedin_scraper - INFO - Query result: ('4191815023', 'AI Engineer', 'LinkedIn', 'Sunnyvale, CA', 'https://www.linkedin.com/jobs/view/ai-engineer-at-linkedin-4191815023?position=3&pageNum=0&refId=PMoVkqq%2Bft0YctRdWDbM7w%3D%3D&trackingId=%2F1ge6FB1VKZNdkO3s8Orzw%3D%3D', "LinkedIn is the world’s largest professional network, built to help members of all backgrounds and experiences achieve more in their careers. Our vis ... (6831 characters truncated) ... provides transparency around the way in which LinkedIn handles personal data of employees and job applicants: https://lnkd.in/GlobalDataPrivacyNotice", 'Not Applicable', 'Full-time', 'Engineering', 'Technology, Information and Internet and IT Services and IT Consulting', 'N/A', '2025-03-14', '2025-04-04 23:22:03')
+2025-04-05 16:10:37,753 - linkedin_scraper - ERROR - Unexpected error (attempt 1/2): module 'src.ai_service.openai.openai_client' has no attribute 'create_chat_completion'
+2025-04-05 16:10:37,753 - linkedin_scraper - ERROR - Unexpected error (attempt 2/2): module 'src.ai_service.openai.openai_client' has no attribute 'create_chat_completion'
+2025-04-05 16:10:37,754 - linkedin_scraper - ERROR - Maximum retries reached, giving up

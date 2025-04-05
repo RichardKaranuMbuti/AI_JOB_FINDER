@@ -27,6 +27,11 @@ from tqdm import tqdm
 # Local application imports
 import config
 from chrome_setup import open_linkedin_in_active_chrome
+from logging import setup_logging
+from models import init_database,session_scope
+
+# Create a logger
+logger = setup_logging()
 
 
 async def fetch_job_details(session, job_id, job_title, location):
@@ -205,74 +210,6 @@ async def process_all_jobs(all_jobs, location, batch_size=5):
     return all_processed_jobs
 
 
-# Set up logging
-def setup_logging():
-    """Set up logging configuration."""
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    
-    log_file = os.path.join(log_dir, f"linkedin_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
-    
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file),
-            logging.StreamHandler()
-        ]
-    )
-    
-    return logging.getLogger("linkedin_scraper")
-
-# Create a logger
-logger = setup_logging()
-
-# Initialize database connection
-def init_database(db_url):
-    """Initialize database connection and tables."""
-    engine = create_engine(db_url)
-    metadata = MetaData()
-    
-    # Define the jobs table
-    jobs_table = Table(
-        'linkedin_jobs', 
-        metadata,
-        Column('job_id', String(50), primary_key=True),
-        Column('job_title', String(255)),
-        Column('company_name', String(255)),
-        Column('location', String(255)),
-        Column('job_url', String(500)),
-        Column('job_description', Text),
-        Column('seniority_level', String(100)),
-        Column('employment_type', String(100)),
-        Column('job_function', String(100)),
-        Column('industries', String(255)),
-        Column('applicants', String(50)),
-        Column('date_posted', String(50)),
-        Column('date_scraped', String(50))
-    )
-    
-    # Create the table if it doesn't exist
-    metadata.create_all(engine)
-    
-    return engine, jobs_table
-
-# Session manager context
-@contextmanager
-def session_scope(engine):
-    """Provide a transactional scope around a series of operations."""
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except Exception as e:
-        logger.error(f"Database session error: {e}")
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 async def async_scrape_linkedin_jobs(job_title=None, location=None, num_pages=None, use_xdotool=None, batch_size=5, max_workers=5):
     """

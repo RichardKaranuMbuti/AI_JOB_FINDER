@@ -1,0 +1,6 @@
+2025-04-05 16:22:21,142 - linkedin_scraper - INFO - Searching for job_id: 4191815023 (type: <class 'str'>)
+2025-04-05 16:22:21,151 - linkedin_scraper - INFO - Total jobs in database: 60
+2025-04-05 16:22:21,152 - linkedin_scraper - INFO - Sample job_id: 4191146990 (type: <class 'str'>)
+2025-04-05 16:22:21,156 - linkedin_scraper - INFO - Query result: ('4191815023', 'AI Engineer', 'LinkedIn', 'Sunnyvale, CA', 'https://www.linkedin.com/jobs/view/ai-engineer-at-linkedin-4191815023?position=3&pageNum=0&refId=PMoVkqq%2Bft0YctRdWDbM7w%3D%3D&trackingId=%2F1ge6FB1VKZNdkO3s8Orzw%3D%3D', "LinkedIn is the world’s largest professional network, built to help members of all backgrounds and experiences achieve more in their careers. Our vis ... (6831 characters truncated) ... provides transparency around the way in which LinkedIn handles personal data of employees and job applicants: https://lnkd.in/GlobalDataPrivacyNotice", 'Not Applicable', 'Full-time', 'Engineering', 'Technology, Information and Internet and IT Services and IT Consulting', 'N/A', '2025-03-14', '2025-04-04 23:22:03')
+2025-04-05 16:22:25,544 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-05 16:22:25,581 - linkedin_scraper - INFO - Successfully saved analysis for job ID: 4191815023

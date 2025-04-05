@@ -1,3 +1,6 @@
+# Update this in config.py
+import os
+
 # LinkedIn Scraper Configuration
 
 # Search parameters
@@ -17,7 +20,13 @@ ELEMENT_WAIT_TIME = 6
 PAGE_NAVIGATION_WAIT_TIME = 3
 
 
+# Get the directory of the config file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Create path to the database
+DB_PATH = os.path.join(BASE_DIR, "linkedin_jobs.db")
+# Set the database URL with the absolute path
+DATABASE_URL = f"sqlite:///{DB_PATH}"
 
-# Database configuration
-DATABASE_URL = "sqlite:///linkedin_jobs.db"  # For SQLite
+
+
 # For MySQL: DATABASE_URL = "mysql+pymysql://username:password@localhost/linkedin_jobs"

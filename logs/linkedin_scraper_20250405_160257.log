@@ -1,0 +1,3 @@
+2025-04-05 16:02:58,593 - linkedin_scraper - INFO - Searching for job_id: 4191815023 (type: <class 'str'>)
+2025-04-05 16:02:58,597 - linkedin_scraper - INFO - Total jobs in database: 0
+2025-04-05 16:02:58,601 - linkedin_scraper - INFO - Query result: None
