@@ -5,3 +5,5 @@ prompt.txt
 checkpoints
 
 .env
+
+logs/
